@@ -94,12 +94,12 @@ task prepareFolly(dependsOn: dependenciesPath ? [] : [downloadFolly], type: Copy
 }
 
 task prepareHermes() {
-    def hermesPackagePath = findNodeModulePath(projectDir, "hermes-engine")
+    def hermesPackagePath = findNodeModulePath(projectDir, "@expo/hermes-dev")
     if (!hermesPackagePath) {
         throw new GradleScriptException("Could not find the hermes-engine npm package")
     }
 
-    def hermesAAR = file("$hermesPackagePath/android/hermes-debug.aar")
+    def hermesAAR = file("$hermesPackagePath/build_android/outputs/hermes-debug.aar")
     if (!hermesAAR.exists()) {
         throw new GradleScriptException("The hermes-engine npm package is missing \"android/hermes-debug.aar\"")
     }
@@ -111,6 +111,11 @@ task prepareHermes() {
         from "src/main/jni/first-party/hermes/Android.mk"
         into "$thirdPartyNdkDir/hermes"
     }
+
+  copy {
+    from "$hermesPackagePath/hermes/API/jsi/jsi"
+    into "$thirdPartyNdkDir/../../../ReactCommon/jsi/jsi"
+  }
 }
 
 task downloadGlog(dependsOn: createNativeDepsDirectories, type: Download) {

@@ -188,13 +188,17 @@ task prepareJSC {
 }
 
 task prepareJSI() {
-  doLast {
-    copy {
-      from("../../../android/ReactCommon/jsi")
-
-      includeEmptyDirs(false)
-      into("$thirdPartyNdkDir/jsi")
-    }
+  def hermesPackagePath = findNodeModulePath(projectDir, "@expo/hermes-dev")
+  if (!hermesPackagePath) {
+    throw new GradleScriptException("Could not find the hermes-engine npm package")
+  }
+  copy {
+    from("../../../android/ReactCommon/jsi")
+    into "$thirdPartyNdkDir/jsi"
+  }  
+  copy {
+    from "$hermesPackagePath/hermes/API/jsi/jsi"
+    into "$thirdPartyNdkDir/jsi/jsi"
   }
 }
 

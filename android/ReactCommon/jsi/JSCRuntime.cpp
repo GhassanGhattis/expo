@@ -152,6 +152,9 @@ class JSCRuntime : public jsi::Runtime {
   std::string utf8(const jsi::String&) override;
 
   jsi::Object createObject() override;
+  jsi::TypedArrayBase createTypedArray(size_t length, jsi::TypedArrayKind kind) override {
+    throw std::runtime_error("test");
+  }
   jsi::Object createObject(std::shared_ptr<jsi::HostObject> ho) override;
   virtual std::shared_ptr<jsi::HostObject> getHostObject(
       const jsi::Object&) override;
@@ -172,9 +175,13 @@ class JSCRuntime : public jsi::Runtime {
       const jsi::Value& value) override;
   bool isArray(const jsi::Object&) const override;
   bool isArrayBuffer(const jsi::Object&) const override;
+  bool isTypedArray(const jsi::Object&) const override { return true;}
   bool isFunction(const jsi::Object&) const override;
   bool isHostObject(const jsi::Object&) const override;
   bool isHostFunction(const jsi::Function&) const override;
+  jsi::TypedArrayKind getTypedArrayKind(const jsi::TypedArrayBase&) const override {
+    return jsi::Int32Array;
+  }
   jsi::Array getPropertyNames(const jsi::Object&) override;
 
   // TODO: revisit this implementation
@@ -184,7 +191,10 @@ class JSCRuntime : public jsi::Runtime {
   jsi::Array createArray(size_t length) override;
   size_t size(const jsi::Array&) override;
   size_t size(const jsi::ArrayBuffer&) override;
+size_t size(const jsi::TypedArrayBase&) override { return 0; };
+  size_t byteLength(const jsi::TypedArrayBase&) override { return 0; };
   uint8_t* data(const jsi::ArrayBuffer&) override;
+  jsi::ArrayBuffer data(const jsi::TypedArrayBase&) override { return jsi::Object(*this).getArrayBuffer(*this); };
   jsi::Value getValueAtIndex(const jsi::Array&, size_t i) override;
   void setValueAtIndexImpl(jsi::Array&, size_t i, const jsi::Value& value)
       override;

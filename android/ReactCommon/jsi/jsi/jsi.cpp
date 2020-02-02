@@ -159,6 +159,20 @@ Array Object::asArray(Runtime& runtime) && {
   return std::move(*this).getArray(runtime);
 }
 
+template <TypedArrayKind T>
+void TypedArray<T>::update(Runtime& runtime, std::vector<ContentType<T>> data) {
+  if (data.size() != length(runtime)) {
+    throw JSError(runtime, "TypedArray can only be updated with a vector of the same size");
+  }
+  uint8_t *rawData = getArrayBuffer(runtime).data(runtime);
+  std::copy(data.begin(), data.end(), reinterpret_cast<ContentType<T>*>(rawData));
+}
+
+#define TYPED_ARRAY(name, content) \
+    template class TypedArray<name##Array>;
+#include "TypedArrays.def"
+#undef TYPED_ARRAY
+
 Function Object::asFunction(Runtime& runtime) const& {
   if (!isFunction(runtime)) {
     throw JSError(

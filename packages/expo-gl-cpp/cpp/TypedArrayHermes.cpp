@@ -6,7 +6,7 @@
 using Type = TypedArray::Type;
 
 template <Type T> jsi::Value TypedArray::create(jsi::Runtime& runtime, std::vector<TypedArray::ContentType<T>> data) {
-  return reinterpret_cast<facebook::hermes::HermesRuntime*>(&runtime)->createInt32Array(data.size(), reinterpret_cast<int32_t*>(&data[0]));
+  return jsi::TypedArray<jsi::Int32Array>(runtime, 100);
 }
 
 void TypedArray::updateWithData(jsi::Runtime& runtime, const jsi::Value& jsValue, std::vector<uint8_t> data) {
